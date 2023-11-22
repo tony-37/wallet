@@ -18,7 +18,7 @@ const options = (): DataSourceOptions => {
     schema: 'public',
     logging: configService.get('IS_PROD') === 'false',
     entities: [join(process.cwd(), 'dist', 'modules', '**', '*entity.{ts,js}')],
-    migrations: [join(process.cwd(), 'migrations', '**', '*migration.ts')],
+    migrations: [join(process.cwd(), 'migrations', '**', '*.ts')],
     migrationsRun: true,
     migrationsTableName: 'migrations',
   };
