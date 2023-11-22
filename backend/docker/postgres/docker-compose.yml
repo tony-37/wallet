@@ -1,0 +1,41 @@
+# Use postgres/example user/password credentials
+version: '3.5'
+
+services:
+  postgres_wallet:
+    container_name: postgres_wallet_container
+    build: ./postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres_db}
+      PGDATA: ${PGDATA:-/data/postgres}
+    volumes:
+      - postgres_wallet:${PGDATA:-/data/postgres}
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    networks:
+      - postgres_wallet
+    restart: unless-stopped
+
+  pgadmin_wallet:
+    container_name: pgadmin_wallet_container
+    build: ./pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+      - pgadmin_wallet:/root/.pgadmin
+    ports:
+      - '${PGADMIN_PORT:-5050}:80'
+    networks:
+      - postgres_wallet
+    restart: unless-stopped
+
+networks:
+  postgres_wallet:
+    driver: bridge
+
+volumes:
+  postgres_wallet:
+  pgadmin_wallet:
