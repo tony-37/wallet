@@ -1,9 +1,9 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import { config } from 'dotenv';
+import { ConfigService, registerAs } from '@nestjs/config';
+import { config as dotenvConfig } from 'dotenv';
 import { join } from 'path';
 
-config({ path: join(process.cwd(), '.env') });
+dotenvConfig({ path: join(process.cwd(), '.env') });
 const configService = new ConfigService();
 
 const options = (): DataSourceOptions => {
@@ -17,11 +17,16 @@ const options = (): DataSourceOptions => {
     type: 'postgres',
     schema: 'public',
     logging: configService.get('IS_PROD') === 'false',
-    entities: [join(process.cwd(), 'dist', 'modules', '**', '*entity.{ts,js}')],
-    migrations: [join(process.cwd(), 'migrations', '**', '*.ts')],
+    entities: [
+      join(process.cwd(), 'dist', 'modules', '**', '*.entity.{ts,js}'),
+    ],
+    migrations: [
+      join(process.cwd(), 'dist', 'migrations', '**', '*migration.js'),
+    ],
     migrationsRun: true,
     migrationsTableName: 'migrations',
   };
 };
 
-export const appDataSource = new DataSource(options());
+export default registerAs('typeorm', () => options());
+export const connectionSource = new DataSource(options());
